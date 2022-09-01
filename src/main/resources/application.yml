@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: form-data-storage-migration-cli
+  main:
+    web-application-type: none
+    banner-mode: off
+    log-startup-info: off
+
+additional-key-patterns:
