@@ -58,14 +58,14 @@ public class FormDataStorageMigrationCliRunner implements CommandLineRunner {
         .filter(this::isNotPresentInRedis)
         .peek(key -> {
           log.info("Migration for '{}' key started", key);
-          var formData = cephFormDataStorageService.getFormData(key);
             try {
+              var formData = cephFormDataStorageService.getFormData(key);
               formData.ifPresentOrElse(
                   data -> redisFormDataStorageService.putFormData(key, data),
                   () -> log.warn("{} not found in storage", key));
               log.info("Migration for '{}' key finished", key);
-            } catch (RuntimeException exception) {
-              log.error("Migration for '{}' key failed", key, exception);
+            } catch (IllegalArgumentException exception) {
+              log.error("Migration for '{}' key failed because of invalid data", key, exception);
             }
         }).collect(Collectors.toSet());
   }

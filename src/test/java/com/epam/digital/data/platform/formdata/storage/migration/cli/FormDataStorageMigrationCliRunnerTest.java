@@ -16,6 +16,8 @@
 
 package com.epam.digital.data.platform.formdata.storage.migration.cli;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -87,25 +89,39 @@ class FormDataStorageMigrationCliRunnerTest {
   }
 
   @Test
-  void shouldMigrateWhenException() {
+  void shouldMigrateWhenExpectedException() {
     var args = buildArgs(true, true);
     var runner = new FormDataStorageMigrationCliRunner(args, validator, cephStorage, redisStorage);
-    var key = keyProvider.generateKey("piid", "taskid");
     var failKey = keyProvider.generateKey("piid", "failTaskid");
-    var keys = Set.of(failKey, key, "invalidKey");
+    var keys = Set.of(failKey);
     var formData = FormDataDto.builder()
         .data(new LinkedHashMap<>(Map.of("name", "John")))
         .build();
 
     when(cephStorage.keys()).thenReturn(keys);
-    when(cephStorage.getFormData(key)).thenReturn(Optional.of(formData));
     when(cephStorage.getFormData(failKey)).thenReturn(Optional.of(formData));
-    doThrow(new RuntimeException("error message")).when(redisStorage).putFormData(failKey, formData);
+    doThrow(new IllegalArgumentException("error message")).when(redisStorage).putFormData(failKey, formData);
 
     runner.run();
 
-    verify(redisStorage, times(1)).putFormData(key, formData);
     verify(cephStorage, times(1)).delete(keys);
+  }
+
+  @Test
+  void shouldNotMigrateWhenRandomException() {
+    var args = buildArgs(false, false);
+    var runner = new FormDataStorageMigrationCliRunner(args, validator, cephStorage, redisStorage);
+    var failKey = keyProvider.generateKey("piid", "failTaskid");
+    var keys = Set.of(failKey);
+    var formData = FormDataDto.builder()
+            .data(new LinkedHashMap<>(Map.of("name", "John")))
+            .build();
+
+    when(cephStorage.keys()).thenReturn(keys);
+    when(cephStorage.getFormData(failKey)).thenReturn(Optional.of(formData));
+    doThrow(new IllegalStateException("error message")).when(redisStorage).putFormData(any(), any());
+
+    assertThrows(IllegalStateException.class, runner::run);
   }
 
   @Test
