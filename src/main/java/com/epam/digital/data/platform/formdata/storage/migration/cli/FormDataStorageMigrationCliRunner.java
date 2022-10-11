@@ -55,13 +55,18 @@ public class FormDataStorageMigrationCliRunner implements CommandLineRunner {
   private Set<String> migrate(Set<String> keys) {
     return keys.stream()
         .filter(validator::isValid)
+        .filter(this::isNotPresentInRedis)
         .peek(key -> {
           log.info("Migration for '{}' key started", key);
           var formData = cephFormDataStorageService.getFormData(key);
-          formData.ifPresentOrElse(
-              data -> redisFormDataStorageService.putFormData(key, data),
-              () -> log.warn("{} not found in storage", key));
-          log.info("Migration for '{}' key finished", key);
+            try {
+              formData.ifPresentOrElse(
+                  data -> redisFormDataStorageService.putFormData(key, data),
+                  () -> log.warn("{} not found in storage", key));
+              log.info("Migration for '{}' key finished", key);
+            } catch (RuntimeException exception) {
+              log.error("Migration for '{}' key failed", key, exception);
+            }
         }).collect(Collectors.toSet());
   }
 
@@ -76,5 +81,13 @@ public class FormDataStorageMigrationCliRunner implements CommandLineRunner {
       cephFormDataStorageService.delete(processedKeys);
       log.info("Migrated forms were deleted from the source storage");
     }
+  }
+
+  private boolean isNotPresentInRedis(String key) {
+    var isEmpty = redisFormDataStorageService.getFormData(key).isEmpty();
+    if (!isEmpty) {
+      log.info("Data for '{}' key found in redis storage", key);
+    }
+    return isEmpty;
   }
 }
