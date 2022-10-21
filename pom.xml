@@ -37,7 +37,7 @@
 		<embedded-redis.version>0.7.1</embedded-redis.version>
 		<wiremock.version>2.27.2</wiremock.version>
 		<ddm-starter-logger.version>1.6.0.1</ddm-starter-logger.version>
-		<ddm-form-data-storage.version>1.8.1-MDTUDDM-13044-SNAPSHOT</ddm-form-data-storage.version>
+		<ddm-form-data-storage.version>1.8.0.2</ddm-form-data-storage.version>
 
 		<start-class>com.epam.digital.data.platform.formdata.storage.migration.cli.FormDataStorageMigrationCliApplication</start-class>
 
