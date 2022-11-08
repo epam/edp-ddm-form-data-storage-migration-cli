@@ -44,5 +44,5 @@ Example: java -jar form-data-storage-migration-cli.jar \
 
 ### License
 
-The registry-regulations-validation-cli is Open Source software released under
+The form-data-storage-migration-cli is Open Source software released under
 the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
