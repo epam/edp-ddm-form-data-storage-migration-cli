@@ -32,6 +32,7 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<spring-boot-maven-plugin.version>2.7.5</spring-boot-maven-plugin.version>
 		<log4j.version>2.17.0</log4j.version>
 		<spring.cloud.version>2021.0.0</spring.cloud.version>
 		<embedded-redis.version>0.7.1</embedded-redis.version>
@@ -125,6 +126,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot-maven-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
