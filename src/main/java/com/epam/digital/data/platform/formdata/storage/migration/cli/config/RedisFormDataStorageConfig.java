@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 @Configuration
 public class RedisFormDataStorageConfig {
@@ -38,9 +39,17 @@ public class RedisFormDataStorageConfig {
     return new RedisStorageConfiguration();
   }
 
+
   @Bean
-  public FormDataStorageService redisFormDataStorageService(
-      StorageServiceFactory redisStorageServiceFactory, RedisStorageConfiguration config) {
-    return redisStorageServiceFactory.formDataStorageService(config);
+  public RedisConnectionFactory redisConnectionFactory(StorageServiceFactory redisStorageServiceFactory,
+                                                       RedisStorageConfiguration config) {
+    return redisStorageServiceFactory.redisConnectionFactory(config);
+  }
+
+  @Bean
+  public FormDataStorageService redisFormDataStorageService(StorageServiceFactory redisStorageServiceFactory,
+                                                            RedisStorageConfiguration config,
+                                                            RedisConnectionFactory redisConnectionFactory) {
+    return redisStorageServiceFactory.formDataStorageService(redisConnectionFactory, config);
   }
 }
